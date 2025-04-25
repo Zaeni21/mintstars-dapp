@@ -1,4 +1,3 @@
-{
-  "source": "/feedback/((?!general).*)",
-  "destination": "/api/feedback/general"
-}
+git add vercel.json
+git commit -m "fix: remove invalid 'source' property"
+git push origin main
