@@ -1,38 +1,63 @@
-import { useState } from "react";
+import { useState } from 'react';
+import { ethers } from 'ethers';
+import Head from 'next/head';
+import toast, { Toaster } from 'react-hot-toast';
+
+const CONTRACT_ADDRESS = "0x32e099A937B9Efc72EE94d49fF781b46c6245A01";
+const ABI = [
+  {
+    "inputs": [
+      { "internalType": "address", "name": "to", "type": "address" },
+      { "internalType": "string", "name": "tokenURI", "type": "string" }
+    ],
+    "name": "mintNFT",
+    "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
+    "stateMutability": "payable",
+    "type": "function"
+  }
+];
 
 export default function MintPage() {
   const [uri, setUri] = useState("");
-  const [status, setStatus] = useState("");
+  const [minting, setMinting] = useState(false);
 
-  const handleMint = async () => {
+  const mintNFT = async () => {
     try {
-      setStatus("Minting...");
-      // wallet & minting logic here (frontend only)
-      setTimeout(() => {
-        setStatus("Minted successfully!");
-      }, 2000);
-    } catch (error) {
-      setStatus("Mint failed!");
+      if (!uri) return toast.error("Enter Metadata URI");
+      setMinting(true);
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(CONTRACT_ADDRESS, ABI, signer);
+      const tx = await contract.mintNFT(await signer.getAddress(), uri, { value: ethers.utils.parseEther("0.1") });
+      await tx.wait();
+      toast.success("NFT Minted Successfully!");
+    } catch (err) {
+      console.error(err);
+      toast.error("Minting failed.");
+    } finally {
+      setMinting(false);
     }
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white p-8">
-      <h1 className="text-3xl font-bold mb-6">Mint Your NFT</h1>
+    <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center p-4">
+      <Head><title>MintStars | Mint NFT</title></Head>
+      <Toaster />
+      <h1 className="text-3xl font-bold mb-4">MintStars NFT</h1>
       <input
         type="text"
-        placeholder="Enter IPFS Metadata URI"
+        placeholder="Enter Metadata IPFS URI (ipfs://...)"
         value={uri}
         onChange={(e) => setUri(e.target.value)}
-        className="text-black p-2 rounded-md mb-4 w-full max-w-md"
+        className="text-black p-2 rounded w-full max-w-lg mb-4"
       />
       <button
-        onClick={handleMint}
-        className="bg-white text-black px-6 py-2 rounded-md hover:bg-gray-300 transition"
+        onClick={mintNFT}
+        disabled={minting}
+        className="bg-purple-600 px-6 py-2 rounded hover:bg-purple-700"
       >
-        Mint NFT (0.1 MON)
+        {minting ? "Minting..." : "Mint NFT (0.1 MON)"}
       </button>
-      {status && <p className="mt-4 text-green-400">{status}</p>}
     </div>
   );
 }
