@@ -1,7 +1,6 @@
 {
-  "name": "jawirnft-generator",
+  "name": "mintstars-dapp",
   "version": "1.0.0",
-  "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -11,9 +10,11 @@
     "next": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "framer-motion": "^10.16.4",
-    "swiper": "^11.1.2",
-    "react-hot-toast": "^2.4.0",
-    "web3.storage": "^5.1.0"
+    "web3.storage": "^4.4.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3",
+    "@types/react": "^18.2.21",
+    "@types/node": "^20.10.5"
   }
 }
